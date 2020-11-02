@@ -14,7 +14,11 @@ const App: () => React$Node = () => {
     <NavigationContainer>
       <Stack.Navigator>
         <Stack.Screen name="Home" component={Home} />
-        <Stack.Screen name="Color Palette" component={ColorPalette} />
+        <Stack.Screen
+          name="ColorPalette"
+          component={ColorPalette}
+          options={({ route }) => ({ title: route.params.palette.name })}
+        />
       </Stack.Navigator>
     </NavigationContainer>
   );
