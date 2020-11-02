@@ -1,4 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
+import { RefreshControl } from 'react-native';
 import { FlatList } from 'react-native-gesture-handler';
 import PaletteShowCase from '../components/PaletteShowcase';
 
@@ -48,16 +49,29 @@ const COLOR_PALETTES = [
 
 const Home = ({ navigation }) => {
   const [palettes, setPalettes] = useState(COLOR_PALETTES);
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   useEffect(() => {
-    console.log('Starting network request');
+    handleFetchPalettes();
+  }, []);
+
+  const handleFetchPalettes = () => {
+    setIsRefreshing(true);
     fetch('https://color-palette-api.kadikraman.now.sh/palettes')
       .then((response) => response.json())
       .then((res) => {
         console.log('PALETTES, ', res);
+        setIsRefreshing(false);
         setPalettes(res);
       })
-      .catch((err) => console.error('Error fetching palettes ', err));
+      .catch((err) => {
+        console.error('Error fetching palettes ', err);
+        setIsRefreshing(false);
+      });
+  };
+
+  const handleRefresh = useCallback(async () => {
+    handleFetchPalettes();
   }, []);
 
   const onItemClick = useCallback(
@@ -68,6 +82,9 @@ const Home = ({ navigation }) => {
   );
   return (
     <FlatList
+      refreshControl={
+        <RefreshControl refreshing={isRefreshing} onRefresh={handleRefresh} />
+      }
       data={palettes}
       keyExtractor={(item) => item.paletteName}
       renderItem={({ item }) => (
