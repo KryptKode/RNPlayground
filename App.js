@@ -17,7 +17,7 @@ const App: () => React$Node = () => {
         <Stack.Screen
           name="ColorPalette"
           component={ColorPalette}
-          options={({ route }) => ({ title: route.params.palette.name })}
+          options={({ route }) => ({ title: route.params.palette.paletteName })}
         />
       </Stack.Navigator>
     </NavigationContainer>

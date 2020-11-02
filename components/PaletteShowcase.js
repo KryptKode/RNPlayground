@@ -8,13 +8,14 @@ const PaletteShowCase = ({ palette, onItemClick }) => {
       underlayColor="#DDDDDD"
       onPress={() => onItemClick(palette)}>
       <View style={styles.container}>
-        <Text style={styles.title}>{palette.name}</Text>
+        <Text style={styles.title}>{palette.paletteName}</Text>
         <FlatList
           horizontal
           data={palette.colors.slice(0, 5)}
-          keyExtractor={(item) => item.name}
+          keyExtractor={(item) => item.paletteName}
           renderItem={({ item }) => (
             <View
+              key={item.paletteName}
               style={[styles.colorBox, { backgroundColor: item.hexCode }]}
             />
           )}

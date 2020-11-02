@@ -1,11 +1,10 @@
-import React from 'react';
-import { Text, View } from 'react-native';
-import { FlatList, TouchableOpacity } from 'react-native-gesture-handler';
+import React, { useCallback, useEffect, useState } from 'react';
+import { FlatList } from 'react-native-gesture-handler';
 import PaletteShowCase from '../components/PaletteShowcase';
 
 const COLOR_PALETTES = [
   {
-    name: 'Solarized',
+    paletteName: 'Solarized',
     colors: [
       { colorName: 'Base03', hexCode: '#002b36' },
       { colorName: 'Base02', hexCode: '#073642' },
@@ -26,7 +25,7 @@ const COLOR_PALETTES = [
     ],
   },
   {
-    name: 'Rainbow',
+    paletteName: 'Rainbow',
     colors: [
       { colorName: 'Red', hexCode: '#FF0000' },
       { colorName: 'Orange', hexCode: '#FF7F00' },
@@ -36,7 +35,7 @@ const COLOR_PALETTES = [
     ],
   },
   {
-    name: 'FrontEnd Masters',
+    paletteName: 'FrontEnd Masters',
     colors: [
       { colorName: 'Red', hexCode: '#c02d28' },
       { colorName: 'Black', hexCode: '#3e3e3e' },
@@ -48,17 +47,32 @@ const COLOR_PALETTES = [
 ];
 
 const Home = ({ navigation }) => {
-  const onItemClick = (palette) => {
-    navigation.navigate('ColorPalette', { palette });
-  };
+  const [palettes, setPalettes] = useState(COLOR_PALETTES);
 
+  useEffect(() => {
+    console.log('Starting network request');
+    fetch('https://color-palette-api.kadikraman.now.sh/palettes')
+      .then((response) => response.json())
+      .then((res) => {
+        console.log('PALETTES, ', res);
+        setPalettes(res);
+      })
+      .catch((err) => console.error('Error fetching palettes ', err));
+  }, []);
+
+  const onItemClick = useCallback(
+    (palette) => {
+      navigation.navigate('ColorPalette', { palette });
+    },
+    [navigation],
+  );
   return (
     <FlatList
-      data={COLOR_PALETTES}
-      keyExtractor={(item) => item.name}
+      data={palettes}
+      keyExtractor={(item) => item.paletteName}
       renderItem={({ item }) => (
         <PaletteShowCase
-          key={item.name}
+          key={item.paletteName}
           palette={item}
           onItemClick={onItemClick}
         />
