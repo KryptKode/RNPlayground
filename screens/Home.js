@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { RefreshControl } from 'react-native';
-import { FlatList } from 'react-native-gesture-handler';
+import { RefreshControl, StyleSheet, Text, View } from 'react-native';
+import { FlatList, TouchableHighlight } from 'react-native-gesture-handler';
 import PaletteShowCase from '../components/PaletteShowcase';
 
 const COLOR_PALETTES = [
@@ -47,9 +47,17 @@ const COLOR_PALETTES = [
   },
 ];
 
-const Home = ({ navigation }) => {
+const Home = ({ navigation, route }) => {
   const [palettes, setPalettes] = useState(COLOR_PALETTES);
   const [isRefreshing, setIsRefreshing] = useState(false);
+
+  const newPalette = route.params ? route.params.newPalette : null;
+
+  console.log('newPalette', newPalette);
+
+  useEffect(() => {
+    newPalette && setPalettes((current) => [newPalette, ...current]);
+  }, [newPalette]);
 
   useEffect(() => {
     handleFetchPalettes();
@@ -80,22 +88,45 @@ const Home = ({ navigation }) => {
     },
     [navigation],
   );
+
+  const onAddNewClick = useCallback(() => {
+    navigation.navigate('AddNewPalette');
+  }, [navigation]);
   return (
-    <FlatList
-      refreshControl={
-        <RefreshControl refreshing={isRefreshing} onRefresh={handleRefresh} />
-      }
-      data={palettes}
-      keyExtractor={(item) => item.paletteName}
-      renderItem={({ item }) => (
-        <PaletteShowCase
-          key={item.paletteName}
-          palette={item}
-          onItemClick={onItemClick}
-        />
-      )}
-    />
+    <View style={styles.container}>
+      <TouchableHighlight underlayColor="#DDDDDD" onPress={onAddNewClick}>
+        <Text style={styles.addNew}> Add new palette </Text>
+      </TouchableHighlight>
+      <FlatList
+        refreshControl={
+          <RefreshControl refreshing={isRefreshing} onRefresh={handleRefresh} />
+        }
+        data={palettes}
+        keyExtractor={(item) => item.paletteName}
+        renderItem={({ item }) => (
+          <PaletteShowCase
+            key={item.paletteName}
+            palette={item}
+            onItemClick={onItemClick}
+          />
+        )}
+      />
+    </View>
   );
 };
+
+const styles = StyleSheet.create({
+  addNew: {
+    fontWeight: 'bold',
+    textAlign: 'center',
+    fontSize: 18,
+    padding: 10,
+    color: 'green',
+  },
+
+  container: {
+    marginTop: 10,
+  },
+});
 
 export default Home;
